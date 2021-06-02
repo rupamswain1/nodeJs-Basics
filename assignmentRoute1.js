@@ -30,7 +30,6 @@ const assignmentRoute1=(req,res)=>{
                 return res.end();
             })
            
-
         default:
             res.write('<html>');
             res.write('<head><title>Assignment 1</title></head>');
