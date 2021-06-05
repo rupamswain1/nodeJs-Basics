@@ -1,28 +1,29 @@
-const path=require('path');
-const express=require('express');
-const routes=express.Router();
+const path = require('path');
 
-const rootDir=require('../utils/path')
+const express = require('express');
 
-const products=[];
+const rootDir = require('../util/path');
 
-routes.use('/add-product',(req,res,next)=>{
-    //res.send('<form method="POST" action="/admin/product"><input type="text" name="title"/><button type="submit">Add Product</button></form>')
-    res.sendFile(path.join(rootDir,'views','add-products.html'))
-})
-//app.get is similar to app.use, only difference is, it is executes only for get request
-routes.get('/product',(req,res,next)=>{ 
-    res.send('<h1>Get request on page</h1>')
-    
-    res.redirect('/');
+const router = express.Router();
+
+const products = [];
+
+// /admin/add-product => GET
+router.get('/add-product', (req, res, next) => {
+  res.render('add-product', {
+    pageTitle: 'Add Product',
+    path: '/admin/add-product',
+    formsCSS: true,
+    productCSS: true,
+    activeAddProduct: true
+  });
 });
-//app.get is similar to app.use, only difference is, it is executes only for post request
-routes.post('/product',(req,res,next)=>{ 
-    //res.send('<h1>Post request on page</h1>')
-    //console.log(req.body)
-    products.push({'title':req.body.title});
-    res.redirect('/'); 
-}); 
 
-exports.routes=routes;
-exports.products=products; 
+// /admin/add-product => POST
+router.post('/add-product', (req, res, next) => {
+  products.push({ title: req.body.title });
+  res.redirect('/');
+});
+
+exports.routes = router;
+exports.products = products;
