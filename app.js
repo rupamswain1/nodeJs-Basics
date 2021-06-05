@@ -4,31 +4,21 @@ const express=require('express');
 
 const app=express();
 
-
 const bodyParser = require('body-parser');
 
+const path=require('path');
+
+const adminRouter=require('./routes/admin');
+const shopRouter=require('./routes/shop');
 
 app.use(bodyParser.urlencoded({extended:false}))
 
-app.use('/add-product',(req,res,next)=>{
-    res.send('<form method="POST" action="/product"><input type="text" name="title"/><button type="submit">Add Product</button></form>')
-})
-//app.get is similar to app.use, only difference is, it is executes only for get request
-app.get('/product',(req,res,next)=>{ 
-    res.send('<h1>Get request on page</h1>')
-    
-    res.redirect('/');
-});
-//app.get is similar to app.use, only difference is, it is executes only for post request
-app.post('/product',(req,res,next)=>{ 
-    res.send('<h1>Post request on page</h1>')
-    
-    res.redirect('/');
-});
+app.use('/admin',adminRouter);
+app.use(shopRouter)
 
-app.use('/',(req,res,next)=>{
-    res.send('<h1>Landing Page</h1>')
-});
+app.use((req,res,next)=>{
+    res.status(404).sendFile(path.join(__dirname,'views','404.html'))
+})
 
 
 //const server=http.createServer(app);
