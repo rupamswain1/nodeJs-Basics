@@ -1,1 +1,9 @@
+sudo mysql -u root -p ->login user
+
+
 USE nodeDB;
+
+CREATE TABLE Products (id int NOT NULL AUTO_INCREMENT, title VARCHAR(255) NOT NULL, price float, description text, imageUrl VARCHAR(255) NOT NULL, PRIMARY KEY(id));
+
+
+INSERT 
