@@ -1,12 +1,13 @@
 const getDb=require('../util/database').getDb;
 const mongoDb=require('mongodb');
 class Product{
-  constructor(title,price,description,imageUrl,id){
+  constructor(title,price,description,imageUrl,id,userId){
     this.title=title;
     this.price=price;
     this.description=description;
     this.imageUrl=imageUrl
-    this._id=id
+    this._id=id;
+    this.userId=userId
   }
 
   save(){
@@ -14,7 +15,7 @@ class Product{
     let dbOp;
     if(this._id){
       dbOp=db.collection('products')
-      .updateOne({_id:new mongoDb.ObjectId(this._id)},{$set:{title:this.title,price:this.price,description:this.description,imageUrl:this.imageUrl}});
+      .updateOne({_id:new mongoDb.ObjectId(this._id)},{$set:{title:this.title,price:this.price,description:this.description,imageUrl:this.imageUrl,userId:this.userId}});
       console.log(this)
     }
     else{
@@ -40,7 +41,7 @@ class Product{
   static findById(prodId){
     const db=getDb();
     return db.collection('products')
-    .find({_id:mongoDb.ObjectID(prodId)})
+    .find({_id:mongoDb.ObjectId(prodId)})
     .next()
     .then(product=>{
       console.log(product);

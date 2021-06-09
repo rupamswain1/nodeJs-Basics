@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 
 const errorController = require('./controllers/error');
 const mongoConnect = require('./util/database');
-// const User=require('./models/user');
+ const User=require('./models/user');
 // const Product=require('./models/product');
 // const Cart=require('./models/cart');
 // const CartItems=require('./models/cartItem');
@@ -19,14 +19,13 @@ const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 
 app.use((req,res,next)=>{
-    // User.findByPk(1)
-    // .then(user=>{
-    //     req.user=user;
-    //     next();
-    // })
-    // .catch(err=>{console.log(err)})
-    next();
-})
+    User.findById('60c0f84636506c7a30e86d68')
+    .then(user=>{
+        req.user=new User(user.username,user.email,user.cart, user._id);
+        next();
+    })
+    .catch(err=>{console.log(err)})
+   })
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
