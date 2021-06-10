@@ -14,11 +14,25 @@ class Users{
     }
 
     addToCart(product){
-        // const cartProduct=this.cart.items.findIndex(cp=>{
-        //     cp.id===product.___id
-        // });
-        console.log('****************************************************************************************************************************************',this._id)
-        const updatedCart={items:[{...product,quantity:1}]};
+        const cartProductindex=this.cart.items.findIndex(cp=>{
+            console.log("------------------------------------------------")
+            console.log(cp)
+            return cp.productId.toString()===product._id.toString();
+        });
+        let newQuantity=1;
+        const updatedCartItem=[...this.cart.items];
+        if(cartProductindex>=0){
+            newQuantity=this.cart.items[cartProductindex].quantity+1;
+            updatedCartItem[cartProductindex].quantity=newQuantity;
+        }
+        else{
+            updatedCartItem.push({
+                productId:new mongoDb.ObjectId(product._id),
+
+                quantity:newQuantity
+            });  
+        }
+        const updatedCart={items:updatedCartItem};
         const db=getDb();
         return db.collection('users').updateOne(
             {_id:new mongoDb.ObjectId(this._id)},
