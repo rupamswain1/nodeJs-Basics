@@ -1,0 +1,7 @@
+Products:[
+    {"_id":{"$oid":"60bfbdef028d5b2125e028f0"},"title":"book title","price":"7789","description":"dESCRIPTION OF BOOL","imageUrl":"Image ur;l"}
+    {"_id":{"$oid":"60c0fe82f9c37b22057e7091"},"title":"ttttt","price":"1111","description":"ddddd","imageUrl":"uuuuu","userId":{"$oid":"60c0f84636506c7a30e86d68"}}
+    {"_id":{"$oid":"60c1186d3d6288166db9fa8c"},"title":"asdasdasd","price":"1111111","description":"asdasdasd","imageUrl":"asdasd","userId":{"$oid":"60c0f84636506c7a30e86d68"}}
+
+]
+users:[{"_id":{"$oid":"60c0f84636506c7a30e86d68"},"username":"rupam","email":"abc@pqr.com","cart":{"items":[{"productId":{"$oid":"60bfbdef028d5b2125e028f0"},"quantity":{"$numberInt":"12"}},{"productId":{"$oid":"60c1186d3d6288166db9fa8c"},"quantity":{"$numberInt":"2"}}]}}]
