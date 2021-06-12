@@ -2,7 +2,7 @@ const Product = require('../models/product');
 //const Cart = require('../models/cart');
 
 exports.getProducts = (req, res, next) => {
-  Product.fetchAll().then(products => {
+  Product.find().then(products => {
     //console.log(products);
     res.render('shop/product-list', {
       prods: products,
@@ -31,7 +31,7 @@ exports.getProduct = (req, res, next) => {
 };
 
 exports.getIndex = (req, res, next) => {
-  Product.fetchAll().then(products => {
+  Product.find().then(products => {
     //console.log(products);
     res.render('shop/index', {
           prods: products,
@@ -43,8 +43,11 @@ exports.getIndex = (req, res, next) => {
 
 exports.getCart = (req, res, next) => {
 
-  req.user.getCart()
+  req.user.populate('cart.items.productId')
+  .execPopulate()
   .then(products=>{
+    //console.log(products.cart.items)
+    products=products.cart.items
     res.render('shop/cart', {
             path: '/cart',
             pageTitle: 'Your Cart',

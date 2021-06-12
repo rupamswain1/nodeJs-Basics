@@ -17,6 +17,10 @@ const ProductSchema=new Schema({
   imageUrl:{
     type:String,
     required:true
+  },
+  user:{
+    type:Schema.Types.ObjectId,
+    ref:'User'
   }
 })
 
@@ -90,4 +94,4 @@ const ProductSchema=new Schema({
 //     .catch(err=>console.log(err))
 //   }
 // };
-module.exports=ProductSchema;
+module.exports=mongoose.model('Product',ProductSchema);

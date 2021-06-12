@@ -7,7 +7,7 @@ const mongoose=require('mongoose');
 
 const errorController = require('./controllers/error');
 //const mongoConnect = require('./util/database');
- //const User=require('./models/user');
+ const User=require('./models/user');
 // const Product=require('./models/product');
 // const Cart=require('./models/cart');
 // const CartItems=require('./models/cartItem');
@@ -21,20 +21,20 @@ const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 
 app.use((req,res,next)=>{
-    // User.findById('60c0f84636506c7a30e86d68')
-    // .then(user=>{
-    //     req.user=new User(user.username,user.email,user.cart, user._id);
-    //     next();
-    // })
-    // .catch(err=>{console.log(err)})
-    next();
+    User.findById('60c4751c3808bf29631e8dae')
+    .then(user=>{
+        req.user=user;
+        next();
+    })
+    .catch(err=>{console.log(err)})
+    //next();
    })
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-//app.use('/admin', adminRoutes);
-//app.use(shopRoutes);
+app.use('/admin', adminRoutes);
+app.use(shopRoutes);
 
 // app.use(errorController.get404);
 // Product.belongsTo(User,{constraints:true,onDelete:'CASCADE'});
@@ -47,6 +47,20 @@ app.use(express.static(path.join(__dirname, 'public')));
 mongoose.connect("mongodb+srv://rupam123:rupam123@nodecluster.plaky.mongodb.net/shop?retryWrites=true&w=majority")
 .then(result=>{
     console.log('connected')
+    User.findOne()
+    .then(user=>{
+        if(!user){
+            const user=new User({
+                name:'rupam',
+                email:'abc@pqr.com',
+                cart:{
+                    items:[]
+                }
+            })
+            user.save();
+        }
+    })
+    
     app.listen(8000);
 })
 .catch(err=>console.log(err)) 
