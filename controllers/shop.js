@@ -86,18 +86,22 @@ exports.postCart = (req, res, next) => {
 
 exports.postCartDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
-  req.session.user
+  User.findById(req.session.user)
+  .then(user=>{
+    user
     .removeFromCart(prodId)
     .then(result => {
       res.redirect('/cart');
     })
     .catch(err => console.log(err));
+  })
+  
 };
 
 exports.postOrder = (req, res, next) => {
   User.findById(req.session.user)
   .then(user=>{
-    user
+    user 
     .populate('cart.items.productId')
     .execPopulate()
     .then(user => {
