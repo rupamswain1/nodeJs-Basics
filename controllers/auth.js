@@ -1,20 +1,30 @@
 const User=require('../models/user');
 const bcrypt=require('bcryptjs')
-
+const {validationResult}=require('express-validator/check')
 
 exports.getLogin = (req, res, next) => {
   //const isLoggedIn=req.get('Cookie').split(';')[0].trim().split('=')[1]
+  let message=req.flash('message');
+  if(message.length>0){
+      message=message[0];
+  }
+  else{
+    message=null;
+  }
   res.render('auth/login', {
     path: '/login',
     pageTitle: 'Login',
-    isAuthenticated: req.session.isLoggedIn,
+    errorMessage:message
   });
 };
 exports.getSignup = (req, res, next) => {
   res.render('auth/signup', {
     path: '/signup',
     pageTitle: 'Signup',
-    isAuthenticated: false
+    isAuthenticated: false,
+    errorMessage:null,
+    oldInput:{email:"", password:"", confirmPassword:""},
+    validationErrors:[]
   });
 };
 exports.postLogin = (req, res, next) => {
@@ -23,6 +33,7 @@ exports.postLogin = (req, res, next) => {
    User.findOne({email:email})
    .then(user=>{
      if(!user){
+       req.flash('error','Invalid email or password')
        res.redirect('/login');
      }
      else{
@@ -49,10 +60,22 @@ exports.postLogin = (req, res, next) => {
     const email=req.body.email;
     const password=req.body.password;
     const confirmPassword=req.body.confirmPassword;
+    const errors=validationResult(req);
+    if(!errors.isEmpty()){
+      console.log(errors.array());
+      return res.status(422).render('auth/signup',{
+        path:'/signup',
+        pageTitle:'Signup',
+        errorMessage:errors.array()[0].msg,
+        oldInput:{email:email, password:password, confirmPassword:confirmPassword},
+        validationErrors:errors.array()
+      },
+      )
+    }
     User.findOne({email:email})
     .then(userDoc=>{
         if(userDoc){
-          console.log('user eixst');
+          req.flash('error','User already exist, please use another email');
           res.redirect('/');
         }
         else{
