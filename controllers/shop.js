@@ -1,21 +1,22 @@
 const Product = require('../models/product');
 const Order = require('../models/order');
-const User=require('../models/user');
+const fs=require('fs');
+const path=require('path');
 
 exports.getProducts = (req, res, next) => {
- 
   Product.find()
     .then(products => {
       console.log(products);
       res.render('shop/product-list', {
         prods: products,
         pageTitle: 'All Products',
-        path: '/products',
-        isAuthenticated: req.session.isLoggedIn
+        path: '/products'
       });
     })
     .catch(err => {
-      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };
 
@@ -26,32 +27,35 @@ exports.getProduct = (req, res, next) => {
       res.render('shop/product-detail', {
         product: product,
         pageTitle: product.title,
-        path: '/products',
-        isAuthenticated: req.session.isLoggedIn
+        path: '/products'
       });
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
 };
 
 exports.getIndex = (req, res, next) => {
+  
   Product.find()
     .then(products => {
       res.render('shop/index', {
         prods: products,
         pageTitle: 'Shop',
-        path: '/',
-        isAuthenticated: req.session.isLoggedIn
+        path: '/'
       });
     })
     .catch(err => {
-      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };
 
 exports.getCart = (req, res, next) => {
-  User.findById(req.session.user).
-  then(user=>{
-    user
+  req.user
     .populate('cart.items.productId')
     .execPopulate()
     .then(user => {
@@ -59,49 +63,49 @@ exports.getCart = (req, res, next) => {
       res.render('shop/cart', {
         path: '/cart',
         pageTitle: 'Your Cart',
-        products: products,
-        isAuthenticated: req.session.isLoggedIn
+        products: products
       });
     })
-  })
-  .catch(err => console.log(err));
+    .catch(err => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
 };
 
 exports.postCart = (req, res, next) => {
   const prodId = req.body.productId;
   Product.findById(prodId)
     .then(product => {
-      console.log('+++++++++++++++++++',req.session.user)
-      User.findById(req.session.user).
-      then(user=>{
-        return user.addToCart(product);
-      })
-      
+      return req.user.addToCart(product);
     })
     .then(result => {
       console.log(result);
       res.redirect('/cart');
+    })
+    .catch(err => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };
 
 exports.postCartDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
-  User.findById(req.session.user)
-  .then(user=>{
-    user
+  req.user
     .removeFromCart(prodId)
     .then(result => {
       res.redirect('/cart');
     })
-    .catch(err => console.log(err));
-  })
-  
+    .catch(err => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
 };
 
 exports.postOrder = (req, res, next) => {
-  User.findById(req.session.user)
-  .then(user=>{
-    user 
+  req.user
     .populate('cart.items.productId')
     .execPopulate()
     .then(user => {
@@ -110,36 +114,50 @@ exports.postOrder = (req, res, next) => {
       });
       const order = new Order({
         user: {
-          email: req.session.user.email,
-          userId: req.session.user
+          email: req.user.email,
+          userId: req.user
         },
         products: products
       });
       return order.save();
     })
-  })
     .then(result => {
-      return User.findById(req.session.user)
-      .then(user=>{
-          user.clearCart();
-      })
-      
+      return req.user.clearCart();
     })
     .then(() => {
       res.redirect('/orders');
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
 };
 
 exports.getOrders = (req, res, next) => {
-  Order.find({ 'user.userId': req.session.user._id })
+  Order.find({ 'user.userId': req.user._id })
     .then(orders => {
       res.render('shop/orders', {
         path: '/orders',
         pageTitle: 'Your Orders',
-        orders: orders,
-        isAuthenticated: req.session.isLoggedIn
+        orders: orders
       });
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
 };
+
+exports.getInvoice=(req,res,next)=>{
+  const orderId=req.params.orderId;
+  const invoice='invoice'+'-'+orderId+'.pdf';
+  const invoicePath=path.join('data','invoices',invoice)
+  fs.readFile(invoicePath,(err,data)=>{
+    if(err){
+      return next(err);
+    }
+    res.send(data);
+  })
+}
