@@ -2,6 +2,8 @@ const Product = require('../models/product');
 const Order = require('../models/order');
 const fs=require('fs');
 const path=require('path');
+const PDFDocument=require('pdfkit');
+
 
 exports.getProducts = (req, res, next) => {
   Product.find()
@@ -152,12 +154,37 @@ exports.getOrders = (req, res, next) => {
 
 exports.getInvoice=(req,res,next)=>{
   const orderId=req.params.orderId;
-  const invoice='invoice'+'-'+orderId+'.pdf';
-  const invoicePath=path.join('data','invoices',invoice)
-  fs.readFile(invoicePath,(err,data)=>{
-    if(err){
-      return next(err);
+  Order.findById(orderId)
+  .then(order=>{
+    if(!order){
+       return next(new Error('No Order found'))
     }
-    res.send(data);
+    if(order.user.userId.toString()!==req.user._id.toString()){
+      return next(new Error('unautorized'))
+    }
+
+    const invoice='invoice-'+orderId+'.pdf';
+    const invoicePath=path.join('data','invoices',invoice)
+
+    const pdfDoc=new PDFDocument();
+    pdfDoc.pipe(fs.createWriteStream(invoicePath));
+    pdfDoc.pipe(res);
+    pdfDoc.text(`Order Id: ${orderId}`)
+    pdfDoc.end();
+    const file=fs.createReadStream(invoicePath);
+    res.setHeader('Content-Type','application/pdf')
+    res.setHeader('Content-Disposition','inline; filename="'+invoice+'"');
+    file.pipe(res);
   })
+  .catch(err=>console.log(err))
+  
+   //fs.readFile(invoicePath,(err,data)=>{
+  //   if(err){
+  //     return next(err);
+  //   }
+  //   res.setHeader('Content-Type','application/pdf')
+  //   res.setHeader('Content-Disposition','inline; filename="'+invoice+'"');
+  //   res.send(data);
+  // })
+ 
 }
