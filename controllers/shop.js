@@ -3,16 +3,42 @@ const Order = require('../models/order');
 const fs=require('fs');
 const path=require('path');
 const PDFDocument=require('pdfkit');
-
+const ITEMS_PER_PAGE=2;
 
 exports.getProducts = (req, res, next) => {
+  let page=req.query.page;
+  console.log(page);
+  let currPage;
+  if(!page){
+    page=1;
+  }
+  if(page<1){
+      currPage=1;
+  }
+  else{
+    currPage=page
+  }
   Product.find()
+  .count()
+  .then(numProducts=>{
+    totalProducts=numProducts;
+    return Product.find()
+    .skip((currPage-1)*ITEMS_PER_PAGE)
+    .limit(ITEMS_PER_PAGE)
+  })
     .then(products => {
       console.log(products);
       res.render('shop/product-list', {
         prods: products,
         pageTitle: 'All Products',
-        path: '/products'
+        path: '/products',
+        totalProducts:totalProducts,
+        hasNextPage:ITEMS_PER_PAGE*page<totalProducts,
+        hasPreviousPage:page>1,
+        nextPage:parseInt(page)+1,
+        previousPage:currPage-1,
+        lastPage:Math.ceil(totalProducts/ITEMS_PER_PAGE),
+        currentPage:parseInt(page)
       });
     })
     .catch(err => {
@@ -38,15 +64,42 @@ exports.getProduct = (req, res, next) => {
       return next(error);
     });
 };
-
+let totalProducts;
 exports.getIndex = (req, res, next) => {
+  let page=req.query.page;
+  console.log(page);
+  let currPage;
+  if(!page){
+    page=1;
+  }
+  if(page<1){
+      currPage=1;
+  }
+  else{
+    currPage=page
+  }
   
   Product.find()
+    .count()
+    .then(numProducts=>{
+        totalProducts=numProducts;
+        return Product.find()
+        .skip((currPage-1)*ITEMS_PER_PAGE)
+        .limit(ITEMS_PER_PAGE)
+    })
     .then(products => {
+      console.log(totalProducts,ITEMS_PER_PAGE*page<totalProducts,page>1, parseInt(page)+1,Math.ceil(totalProducts/ITEMS_PER_PAGE))
       res.render('shop/index', {
         prods: products,
         pageTitle: 'Shop',
-        path: '/'
+        path: '/',
+        totalProducts:totalProducts,
+        hasNextPage:ITEMS_PER_PAGE*page<totalProducts,
+        hasPreviousPage:page>1,
+        nextPage:parseInt(page)+1,
+        previousPage:currPage-1,
+        lastPage:Math.ceil(totalProducts/ITEMS_PER_PAGE),
+        currentPage:parseInt(page)
       });
     })
     .catch(err => {
