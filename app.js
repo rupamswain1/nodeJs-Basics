@@ -11,7 +11,7 @@ const multer = require('multer');
 
 const errorController = require('./controllers/error');
 const User = require('./models/user');
-//const helmet=require('helmet')
+const helmet=require('helmet')
 //const compression=require('compression')
 const morgan=require('morgan')
 const fs=require('fs')
@@ -44,7 +44,9 @@ const MONGODB_URI =
 const accrssLogStream=fs.createWriteStream(path.join(__dirname,'access.log'),{flags:'a'})
 
 const app = express();
-//app.use(helmet())
+app.use(helmet({
+  contentSecurityPolicy: false,
+}));
 //app.use(compression())
 app.use(morgan('combined',{stream:accrssLogStream}))
 
