@@ -1,0 +1,9 @@
+{
+    "env":{
+        "PORT":8000,
+        "MONGO_USER":"rupam123",
+        "MONGO_PASSWORD":"rupam123",
+        "MONGO_DATABASE":"shop",
+        "STRIPE_KEY":"sk_test_43SsF03laS0J8GELXCkrLySI00j34NQlzP"
+    }
+}

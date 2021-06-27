@@ -11,6 +11,14 @@ const multer = require('multer');
 
 const errorController = require('./controllers/error');
 const User = require('./models/user');
+const helmet=require('helmet')
+const compression=require('compression')
+const morgan=require('morgan')
+const fs=require('fs')
+const https=require('https');
+
+const privateKey=fs.readFileSync('server.key');
+const certificate=fs.readFileSync('server.cert');
 
 const fileStorage=multer.diskStorage({
   destination:(req,file,cb)=>{
@@ -30,10 +38,17 @@ const fileFilter=(req,file,cb)=>{
     cb(null,false);
   }
 }
+console.log(process.env.MONGO_DATABASE)
 const MONGODB_URI =
-'mongodb+srv://rupam123:rupam123@nodecluster.plaky.mongodb.net/shop?retryWrites=true&w=majority';
+`mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@nodecluster.plaky.mongodb.net/${process.env.MONGO_DATABASE}?retryWrites=true&w=majority`;
+const accrssLogStream=fs.createWriteStream(path.join(__dirname,'access.log'),{flags:'a'})
 
 const app = express();
+app.use(helmet())
+app.use(compression())
+app.use(morgan('combined',{stream:accrssLogStream}))
+
+
 const store = new MongoDBStore({
   uri: MONGODB_URI,
   collection: 'sessions'
@@ -101,7 +116,8 @@ mongoose
   .connect(MONGODB_URI)
   .then(result => {
     console.log('listning server');
-    app.listen(8000);
+   // https.createServer({key:privateKey,cert:certificate},app).listen(process.env.PORT);
+   app.listen(process.env.PORT||3000)
   })
   .catch(err => {
     console.log(err);

@@ -5,10 +5,11 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon app.js",
-    "start-server": "node app.js"
+    "start": "NODE_ENV=production PORT=8000 MONGO_USER=rupam123 MONGO_PASSWORD=rupam123 MONGO_DATABASE=shop STRIPE_KEY=sk_test_43SsF03laS0J8GELXCkrLySI00j34NQlzP node app.js",
+    "start-server": "node app.js",
+    "start-dev":"nodemon app.js"
   },
-  "author": "Maximilian Schwarzmüller",
+  "author": "Rupam",
   "license": "ISC",
   "devDependencies": {
     "nodemon": "^2.0.7"
