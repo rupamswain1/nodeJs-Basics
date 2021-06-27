@@ -117,7 +117,8 @@ mongoose
   .then(result => {
     console.log('listning server');
    // https.createServer({key:privateKey,cert:certificate},app).listen(process.env.PORT);
-   app.listen(process.env.PORT || 5000)
+  
+   app.listen(process.env.PORT)
   })
   .catch(err => {
     console.log(err);
