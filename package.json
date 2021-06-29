@@ -7,7 +7,7 @@
     "node": "16.1.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha",
     "start": "NODE_ENV=production MONGO_USER=rupam123 MONGO_PASSWORD=rupam123 MONGO_DATABASE=shop STRIPE_KEY=sk_test_43SsF03laS0J8GELXCkrLySI00j34NQlzP node app.js",
     "start-server": "node app.js",
     "start-dev": "nodemon app.js"
@@ -15,11 +15,13 @@
   "author": "Rupam",
   "license": "ISC",
   "devDependencies": {
+    "chai": "^2.3.0",
+    "mocha": "^9.0.1",
     "nodemon": "^2.0.7"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
-    "body-parser": "^1.18.3",
+    "body-parser": "^1.18.3", 
     "compression": "^1.7.4",
     "connect-flash": "^0.1.1",
     "connect-mongodb-session": "^2.0.3",
